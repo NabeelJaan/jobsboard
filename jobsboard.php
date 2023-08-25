@@ -32,7 +32,7 @@ function jb_custom_post_type() {
 		]
 	);
 
-	register_post_type('Job Application',[
+	register_post_type('job_application',[
 			'labels'      => array(
 				'name'          => __( 'Job Application', 'Nabeel' ),
 				'singular_name' => __( 'application', 'Nabeel' ),
@@ -46,27 +46,21 @@ function jb_custom_post_type() {
 		]
 	);
 
-}
-
-add_action('init', 'jb_custom_post_type');
-
-
-function wpdocs_create_book_tax_rewrite() {
-
-	register_taxonomy('Job Categories', ['jobs_board'], [
-		'label'         		=> __( 'job Categories', 'Nabeel' ),
+	// Register Taxomonies
+	register_taxonomy('job_categories', ['jobs_board'], [
+		'label'         		=> __( 'Job Categories', 'Nabeel' ),
 		'public'        		=> true,
 		'hierarchical'  		=> true,
 		'show_ui'       		=> true,
 		'query_var'     		=> true,
 		'show_in_rest'			=> true,
 		'show_admin_column'     => true,
-		'show_in_quick_edit'    => true,
+		'show_in_quick_edit'    => true,	
 		'rewrite'				=> [ 'slug' => 'job Categories' ],
 	]);
 
-	register_taxonomy('Job Types', ['jobs_board'], [
-		'label'         		=> __( 'job Types', 'Nabeel' ),
+	register_taxonomy('job_types', ['jobs_board'], [
+		'label'         		=> __( 'Job Types', 'Nabeel' ),
 		'public'        		=> true,
 		'hierarchical'  		=> true,
 		'show_ui'       		=> true,
@@ -77,8 +71,8 @@ function wpdocs_create_book_tax_rewrite() {
 		'rewrite'				=> [ 'slug' => 'job types' ],
 	]);
 
-	register_taxonomy('Job Location', ['jobs_board'], [
-		'label'         		=> __( 'job Location', 'Nabeel' ),
+	register_taxonomy('job_location', ['jobs_board'], [
+		'label'         		=> __( 'Job Location', 'Nabeel' ),
 		'public'        		=> true,
 		'hierarchical'  		=> true,
 		'show_ui'       		=> true,
@@ -91,7 +85,75 @@ function wpdocs_create_book_tax_rewrite() {
 
 }
 
-add_action( 'init', 'wpdocs_create_book_tax_rewrite', 0 );
+add_action('init', 'jb_custom_post_type');
+
+
+function jobsboard_meta_boxe() {
+    $screens = [ 'post', 'jobs_board' ];
+    foreach ( $screens as $screen ) {
+        add_meta_box(
+            'jobsboard_box_id',
+            'Job data',
+            'jobsboard_custom_box_html',
+            $screen
+        );
+    }
+}
+add_action( 'add_meta_boxes', 'jobsboard_meta_boxe' );
+
+function jobsboard_custom_box_html( $post ) {
+    $company_name = get_post_meta( $post->ID, '_jobsboard_company_name', true );
+    $company_website = get_post_meta( $post->ID, '_jobsboard_company_website', true );
+    $company_tagline = get_post_meta( $post->ID, '_jobsboard_company_tagline', true );
+    $company_logo = get_post_meta( $post->ID, '_jobsboard_company_logo', true );
+    ?>
+		<label for="company_name">Company Name:</label>
+		<input type="text" id="company_name" name="company_name" value="<?php echo esc_attr( $company_name ); ?>">
+
+		<label for="company_website">Company Website:</label>
+		<input type="url" id="company_website" name="company_website" value="<?php echo esc_attr( $company_website ); ?>">
+
+		<label for="company_tagline">Company Tagline:</label>
+		<input type="text" id="company_tagline" name="company_tagline" value="<?php echo esc_attr( $company_tagline ); ?>">
+
+		<label for="company_logo">Company Logo:</label>
+		<input type="text" id="company_logo" name="company_logo" value="<?php echo esc_attr( $company_logo ); ?>">
+    <?php
+}
+
+function jobsboard_save_postdata( $post_id ) {
+    if ( array_key_exists( '_jobsboard_company_name', $_POST ) ) {
+        update_post_meta(
+            $post_id,
+            '_jobsboard_company_name',
+            sanitize_text_field( $_POST['company_name'] )
+        );
+    }
+	if ( array_key_exists( 'company_website', $_POST ) ) {
+        update_post_meta(
+            $post_id,
+            '_jobsboard_company_website',
+            sanitize_text_field( $_POST['company_website'] )
+        );
+    }
+	if ( array_key_exists( 'company_tagline', $_POST ) ) {
+        update_post_meta(
+            $post_id,
+            '_jobsboard_company_tagline',
+            sanitize_text_field( $_POST['company_tagline'] )
+        );
+    }
+	if ( array_key_exists( 'company_logo', $_POST ) ) {
+        update_post_meta(
+            $post_id,
+            '_jobsboard_company_logo',
+            sanitize_text_field( $_POST['company_logo'] )
+        );
+    }
+}
+add_action( 'save_post', 'jobsboard_save_postdata' );
+
+
 
 
 /**
