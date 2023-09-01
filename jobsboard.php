@@ -15,8 +15,6 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-
-
 class JobBoardPostType {
     public function __construct() {
         add_action('init', array($this, 'register_post_types'));
@@ -182,7 +180,6 @@ class PluginActivation {
     }
 
     public function activate() {
-        // Assuming jb_custom_post_type() is defined in the same class
         $custom_post_type = new JobBoardPostType();
         $custom_post_type->register_post_types();
         flush_rewrite_rules();
