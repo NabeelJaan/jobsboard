@@ -16,3 +16,11 @@ add_filter('single_template', 'jobsboard_single_template');
 */
 
 wp_enqueue_style('jobsboard_style', get_template_directory_uri(). 'css/style.css', array(), '1.0.0', 'all' );
+
+/*
+    =====================
+      Add Custom columns
+    =====================
+*/
+
+do_action( "manage_{$post->jobs_board}_posts_custom_column", $column_name, $post->ID );
